@@ -299,63 +299,65 @@
 /* PAGINA FINANAÇAS*/
 .DivGastoMensal {
   position: absolute;
-  top: 100px;
+  top: 11.5vh;
   background-color: green;
   color: white;
-  padding: 55px 100px;
-  margin-left: 50px;
+  padding: 6.5vh 6vw;
+  margin-left: 2.5vw;
   border: none;
-  border-radius: 30px;
+  border-radius: 5vh;
   opacity: 85%;
 }
 
 .DivCarteiraDisponivel {
   position: absolute;
-  top: 100px;
-  left: 80px;
+  top: 11.5vh;
+  left: 5vw;
   background-color: white;
   color: black;
-  padding: 80px 80px;
+  padding: 9vh 4vw;
   border: none;
-  border-radius: 30px;
+  border-radius: 5vh;
   display: flex;
 }
 
 .Textos {
   display: flex;
   flex-direction: column;
-  margin-right: 50px;
+  margin-right: 2vw;
 }
 
 .Dinheiro {
-  margin-left: 0px;
+  margin-left: 0vw;
 }
 
 .DivObjetivos {
   position: absolute;
-  top: 100px;
-  left: 1150px;
+  top: 11.5vh;
+  left: 66vw;
   background-color: white;
   color: black;
-  padding: 82px 130px;
+  padding: 9.5vh 7vw;
   border: none;
-  border-radius: 30px;
+  border-radius: 5vh;
   display: flex;
 }
 
 .Container {
   position: absolute;
-  top: 350px;
+  top: 40vh;
   background-color: white;
   color: black;
-  padding: 125px 600px;
+  padding: 2vh 34vw;
   border: none;
-  border-radius: 30px;
+  border-radius: 5vh;
   text-align: center;
+  height: 35vh;
+  z-index: 0;
 }
 
 .TituloDiv {
-  margin-bottom: 30px;
+  margin-bottom: 2.5vh;
 }
 
 .DivCentralizada {
@@ -365,16 +367,16 @@
 
 .Div1,
 .Div2 {
-  margin: 0 50px;
+  margin: 0 3vw;
 }
 
 .BolaVerde,
 .BolaVermelha {
-  width: 30px;
-  height: 30px;
+  width: 3.5vw;
+  height: 7vh;
   border-radius: 50%;
   display: inline-block;
-  margin-bottom: 10px;
+  margin-bottom: 2vh;
 }
 
 .BolaVerde {
@@ -383,6 +385,25 @@
 
 .BolaVermelha {
   background-color: red;
+}
+
+.addDespesa{
+  margin-top: 70vh;
+  background: green;
+  height: 22vh;
+  width: 10vw;
+  display: flex;
+  justify-content: center;
+  border-radius: 3.5vh;
+  z-index: 1;
+}
+.ButonAddDespesa{
+  color: #fff;
+  margin: 4.5vh 0vw 0vh .5vw;
+}
+.TextDespesa{
+  margin-top: 1vh;
+  color: #fff;
 }
 
 /* Pagina de Estatistica */
@@ -431,4 +452,153 @@
 .Bot a {
   text-decoration: none;
   color: black;
+}
+
+
+/* components/Form.module.css */
+.ContainerDespesa {
+  position: absolute;
+  top: 15vh;
+  background-color: white;
+  color: black;
+  padding: 2vh 34vw;
+  border: none;
+  border-radius: 5vh;
+  text-align: center;
+  height: 50vh;
+  z-index: 0;
+}
+
+.form__group {
+  position: relative;
+  padding: 1vh 1vw ;
+  margin-top: 1.5vh;
+  width: 20vw;
+  border: .1vh solid #000;
+  display: flex;
+  justify-content: start;
+}
+
+.form__field {
+  font-family: inherit;
+  width: 20vw;
+  border: 0;
+  border-bottom: 2px solid #9b9b9b;
+  outline: 0;
+  font-size: 1.3rem;
+  color: #000;
+  padding: 7px 0;
+  background: transparent;
+  transition: border-color 0.2s;
+}
+
+.form__field::placeholder {
+  color: transparent;
+}
+
+.form__field:placeholder-shown ~ .form__label {
+  font-size: 1.3rem;
+  cursor: text;
+  top: 20px;
+}
+
+.form__label {
+  position: absolute;
+  top: 0;
+  display: block;
+  transition: 0.2s;
+  font-size: 1rem;
+  color: #9b9b9b;
+}
+
+.form__field:focus ~ .form__label {
+  position: absolute;
+  top: 0;
+  display: block;
+  transition: 0.2s;
+  font-size: 1rem;
+  color: #11991c;
+  font-weight: 700;
+}
+
+.form__field:focus {
+  padding-bottom: 6px;
+  font-weight: 700;
+  border-width: 3px;
+  border-image: linear-gradient(to right, #11991c, #38ef7d);
+  border-image-slice: 1;
+}
+
+.form__field:required,
+.form__field:invalid {
+  box-shadow: none;
+}
+
+.wrapper{
+  position: fixed;
+  margin-top: 7.5vh;
+  margin-left: 15vw;
+  transform: translate(-50%, -50%);
+}
+
+.link_wrapper{
+  position: relative;
+}
+
+.link_wrapper a{
+  display: block;
+  width: 10vw;
+  height: 6vh;
+  line-height: 6vh;
+  font-weight: bold;
+  text-decoration: none;
+  background: #333;
+  text-align: center;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: .3vh solid #333;
+  transition: all .35s;
+}
+
+.icon{
+  width: 50px;
+  height: 50px;
+  border: 3px solid transparent;
+  position: absolute;
+  transform: rotate(45deg);
+  right: 0;
+  top: 0;
+  z-index: -1;
+  transition: all .35s;
+}
+
+.icon svg{
+  width: 30px;
+  position: absolute;
+  top: calc(50% - 15px);
+  left: calc(50% - 15px);
+  transform: rotate(-45deg);
+  fill: #2ecc71;
+  transition: all .35s;
+}
+
+.button {
+  cursor: pointer;
+  font-size: 16px;
+  padding: 10px 20px;
+  margin-right: 10px;
+  border: none;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+  margin-top: 2vh;
+
+  /* Estilo padrão */
+  background-color: #e74c3c;
+  color: #fff;
+}
+
+/* Estilo para o botão Cancelar */
+.cancelar {
+  background-color: green;
 }

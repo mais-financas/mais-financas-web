@@ -5,15 +5,17 @@ const LineChart = ({ data }) => {
   const chartRef = useRef(null);
 
   useEffect(() => {
+    if (!chartRef.current) return;
+
     const ctx = chartRef.current.getContext('2d');
-    const chart = new Chart(ctx, {
+    const myChart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: data.labels,
+        labels: data && data.labels ? data.labels : [],
         datasets: [
           {
             label: 'Gastos',
-            data: data.values,
+            data: data && data.values ? data.values : [],
             backgroundColor: 'rgba(75, 192, 192, 0.2)',
             borderColor: 'rgba(75, 192, 192, 1)',
             borderWidth: 1,
@@ -27,9 +29,9 @@ const LineChart = ({ data }) => {
 
     return () => {
       // Limpar o gráfico ao desmontar o componente
-      chart.destroy();
+      myChart.destroy();
     };
-  }, []);
+  }, [data]);
 
   return (
     <div style={{ width: '400px' }}>

@@ -1,21 +1,63 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
+import Head from 'next/head';
+import styles from '@/styles/Home.module.css';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PieChart from '@/pages/PieChart';
 import LineChart from '@/pages/LineChart';
 
-const inter = Inter({ subsets: ['latin'] })
-
 export default function Home() {
-
   const router = useRouter();
+
+  const [meses, setMeses] = useState([]);
+  const [valoresPorMes, setValoresPorMes] = useState([]);
+
+  const [categorias, setCategorias] = useState([]);
+  const [gastosPorCategoria, setGastosPorCategoria] = useState([]);
+
+  useEffect(() => {
+  const fetchData = async () => {
+    try {
+      // Substitua pela sua URL correta
+      const response = await fetch('http://localhost:8080/gastos-por-categoria');
+      const data = await response.json();
+
+      // Extraia as categorias e os valores da resposta
+      const labels = data.gastosPorCategoria.map(item => item.categoria);
+      const values = data.gastosPorCategoria.map(item => parseFloat(item.total_gasto));
+
+      // Atualiza os estados
+      setCategorias(labels);
+      setGastosPorCategoria(values);
+    } catch (error) {
+      console.error('Erro ao buscar dados:', error);
+    }
+  };
+
+  const fetchDataLine = async () => {
+    try {
+      // Substitua pela sua URL correta
+      const response = await fetch('http://localhost:8080/gastos-por-meses');
+      const data = await response.json();
+  
+      // Extraia os meses e os valores da resposta
+      const labels = data.gastosPorMeses.map(item => item.mes);
+      const values = data.gastosPorMeses.map(item => parseFloat(item.total_gasto));
+  
+      // Atualiza os estados
+      setMeses(labels);
+      setValoresPorMes(values);
+    } catch (error) {
+      console.error('Erro ao buscar dados:', error);
+    }
+  };
+
+    fetchData();
+    fetchDataLine();
+  }, []);
 
   const handleFinancasClick = () => {
     router.push('/financas');
-  }
+  };
 
   const handleMenuClick = () => {
     router.push('/menu');
@@ -23,25 +65,24 @@ export default function Home() {
 
   const handleEstatisticaClick = () => {
     router.push('/estatistica');
-  }
+  };
 
   const handleConsultoriaClick = () => {
     router.push('/consultoria');
-  }
+  };
 
+  // Exemplo de como os dados podem ser obtidos na página Home
   const chartData = {
-    labels: ['Essenciais', 'Lazer', 'Reserva'],
-    values: [10.000, 7.320, 2.670],
+    labels: categorias || [],
+    values: gastosPorCategoria || [],
   };
 
-  const data = {
-    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
-    values: [100, 150, 200, 120, 180, 90],
+  const LineData = {
+    labels: meses || [],
+    values: valoresPorMes || [],
   };
-
   
   return (
-
     <>
       <Head>
         <title>Create Next App</title>
@@ -49,7 +90,7 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={`${styles.main} ${inter.className}`}>
+      <main className={`${styles.main}`}>
         <ul className={styles.menu}>
           <li>
             <a onClick={handleFinancasClick}>+Finanças</a>
@@ -66,16 +107,15 @@ export default function Home() {
         </ul>
 
         <div className={styles.GraficoRosca}>
-            <h1>Gestão de Gastos</h1>
-            <PieChart data={chartData} />
+          <h1>Gestão de Gastos</h1>
+          <PieChart data={chartData} />
         </div>
-           
+
         <div className={styles.GraficoLinha}>
-            <h1>Gastos</h1>
-            <LineChart data={data} />
+          <h1>Gastos</h1>
+          {/* Passa meses e valoresPorMes diretamente */}
+          <LineChart data={LineData} />
         </div>
-
-
       </main>
     </>
   );

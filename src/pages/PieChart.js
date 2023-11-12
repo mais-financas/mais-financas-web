@@ -17,6 +17,8 @@ const PieChart = ({ data }) => {
               '#00FF00',
               '#FFFF00',
               '#0000FF',
+              '#000000',
+              '#FFFFFF',
             ],
           },
         ],
@@ -30,7 +32,7 @@ const PieChart = ({ data }) => {
       // Limpar o gráfico ao desmontar o componente
       chart.destroy();
     };
-  }, []);
+  }, [data]);
 
   return (
     <div style={{ width: '400px' }}>

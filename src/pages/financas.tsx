@@ -1,14 +1,48 @@
+import React, { useState, useEffect } from 'react';
 import Head from 'next/head'
 import Image from 'next/image'
 import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css'
 import { useRouter } from 'next/router';
+import { Colors } from 'chart.js';
 
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
 
   const router = useRouter();
+  const [gastoMensal, setGastoMensal] = useState(null);
+  const [mesAtual, setMesAtual] = useState('');
+
+  useEffect(() => {
+    const fetchGastoMensal = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/gastos-do-mes-atual');
+        const data = await response.json();
+        
+        const somaGastos = data.gastosDoMesAtual.reduce((total, gasto) => total + gasto.Valor, 0);
+
+        setGastoMensal(somaGastos);
+      } catch (error) {
+        console.error('Erro ao obter gastos mensais:', error.message);
+      }
+    };
+
+    const obterMesAtual = () => {
+      const meses = [
+        'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+      ];
+
+      const agora = new Date();
+      const nomeMesAtual = meses[agora.getMonth()];
+
+      setMesAtual(nomeMesAtual);
+    };
+
+    fetchGastoMensal();
+    obterMesAtual();
+  }, []);
 
   const handleFinancasClick = () => {
     router.push('/financas');
@@ -24,6 +58,10 @@ export default function Home() {
 
   const handleConsultoriaClick = () => {
     router.push('/consultoria');
+  }
+
+  const handleDespesaClick = () => {
+    router.push('/novadespesa');
   }
   
   return (
@@ -51,15 +89,15 @@ export default function Home() {
         </ul>
 
         <div className={styles.DivGastoMensal}>
-            <h3>Gasto Mensal Disponivel</h3>
-            <h1>R$: 1,230</h1>
+            <h3>Gasto Mensal</h3>
+            <h1>R$: {gastoMensal !== null ? gastoMensal.toFixed(2) : 'Carregando...'}</h1>
             <br></br>
             <a href="#"><h5>Ver Detalhes</h5></a>
         </div>
 
         <div className={styles.DivCarteiraDisponivel}>
             <div className={styles.Textos}>
-                <h5>Carteira Disponível em Junho</h5>
+                <h5>Carteira Disponível em {mesAtual}</h5>
                 <br></br>
                 <h6>Dinheiro Disponível</h6>
             </div>
@@ -90,10 +128,17 @@ export default function Home() {
                 </div>
                 <div className={styles.Div2}>
                     <div className={styles.BolaVermelha}></div>
-                    <h3>$1,800.00</h3>
+                    <h3>${gastoMensal !== null ? gastoMensal.toFixed(2) : 'Carregando...'}</h3>
                     <h4>Despesas</h4>
                 </div>
             </div>
+        </div>
+
+        <div className={styles.addDespesa}>
+          <a onClick={handleDespesaClick}>
+            <Image className={styles.ButonAddDespesa} src="/add-button.svg" alt="Add Despesa" width={70} height={70}/>
+            <h5 className={styles.TextDespesa}>Add Despesa</h5>
+          </a>
         </div>
       </main>
     </>
