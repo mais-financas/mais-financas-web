@@ -236,21 +236,21 @@
 }
 
 .menu {
-  position: absolute;
+  position: relative; /* Mantenha a posição desejada */
   top: 3px;
   background-color: #00FA9A;
   color: black;
-  padding: 20px 610px;
-  border: none;
+  padding: 10px 0; /* Ajuste o espaçamento interno conforme necessário */
   border-radius: 10px;
-  opacity: 85%;
   display: flex;
-  cursor: pointer;
-  opacity: 80%;
+  justify-content: center; /* Alinhamento centralizado */
+  width: 99%;
+  height: 5vh;
 }
 
 .menu li {
-  margin-right: 50px;
+  list-style: none; /* Remova marcadores de lista */
+  margin-right: 20px; /* Ajuste o espaçamento entre os itens conforme necessário */
 }
 
 .menu a {
@@ -258,11 +258,21 @@
   color: #333;
   font-weight: bold;
   transition: color 0.3s;
+  padding: 8px 12px;
+  border-radius: 6px;
 }
 
 .menu a:hover {
   color: #0ee92f;
+  background-color: #fff;
 }
+
+/* Estilizar link ativo */
+.menu a.active {
+  color: #0ee92f;
+  background-color: #fff;
+}
+
 /* PAGINA INDEX*/
 .image {
   position: absolute;
@@ -301,13 +311,27 @@
   position: absolute;
   top: 11.5vh;
   background-color: green;
-  color: white;
+  color: black;
   padding: 6.5vh 6vw;
   margin-left: 2.5vw;
   border: none;
   border-radius: 5vh;
   opacity: 85%;
 }
+
+/* PAGINA FINANÇAS */
+.MenorQue500 {
+  background-color: rgb(81, 242, 91);
+}
+
+.Entre500e1000 {
+  background-color: rgb(242, 242, 91);
+}
+
+.MaiorQue1000 {
+  background-color: rgb(220, 61, 61);
+}
+
 
 .DivCarteiraDisponivel {
   position: absolute;
@@ -441,10 +465,9 @@
   top: 100px;
   background-color: white;
   color: black;
-  padding: 180px 180px;
+  padding: 50px 180px;
   border: none;
   border-radius: 30px;
-  display: flex;
   flex-direction: column;
   text-align: center;
 }
@@ -601,4 +624,156 @@
 /* Estilo para o botão Cancelar */
 .cancelar {
   background-color: green;
+}
+
+
+
+/* Estilos para cada cartão de despesa */
+.expenseCard {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.expenseCard .upperSection {
+  background-color: #e74c3c;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.expenseCard .lowerSection {
+  padding: 0 16px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.expenseCard .typeAndValue {
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+}
+
+.expenseCard .expenseType {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.expenseCard .expenseValue {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.expenseCard .info {
+  margin-bottom: 12px;
+  width: 100%;
+}
+
+.expenseCard .infoRow {
+  display: flex;
+  align-items: center;
+}
+
+.expenseCard label {
+  font-weight: bold;
+  color: #555;
+  margin-right: 8px;
+  flex-basis: 30%; /* Definindo a largura base do label */
+}
+
+.expenseCard input[type='text'] {
+  border: none;
+  background-color: transparent;
+  font-size: 16px;
+  color: #333;
+  padding: 8px;
+  width: 100%;
+  max-width: calc(70% - 8px); /* Ajuste para o tamanho do input ocupar o restante do espaço */
+  border-bottom: 1px solid #ddd;
+  box-sizing: border-box;
+}
+
+/* Estilos para a lista de despesas */
+.expensesList {
+  list-style: none;
+  padding: 0;
+}
+
+/* Estilos para o cabeçalho das despesas */
+.expensesHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.selectCategory select {
+  padding: 8px;
+  font-size: 16px;
+}
+
+.totalExpenses {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* Dentro do arquivo Home.module.css */
+/* Estilos para o contêiner do valor total */
+.totalContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* Estilos para o valor total das despesas */
+.totalExpenses {
+  font-size: 24px;
+  font-weight: bold;
+  color: #ff4500; /* Cor destacada */
+  margin-left: 5vh;
+}
+
+/* Estilos para o select */
+.selectContainer {
+  margin-top: 20px; /* Espaço entre o valor total e o select */
+}
+
+.select {
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  outline: none;
+  /* Adicione mais estilos conforme necessário */
+}
+
+.select option:hover {
+  background: #ff4500;
+}
+
+/* Estilos para os botões de paginação */
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px; /* Espaço entre a lista de despesas e os controles de paginação */
+}
+
+.pagination button {
+  padding: 8px 16px;
+  margin: 0 5px;
+  border: 1px solid #ff4500; /* Cor destacada */
+  border-radius: 5px;
+  background-color: #ff4500; /* Cor de fundo destacada */
+  color: white; /* Cor do texto */
+  cursor: pointer;
+  outline: none;
+}
+
+.pagination button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

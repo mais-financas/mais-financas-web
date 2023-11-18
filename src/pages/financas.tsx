@@ -4,12 +4,10 @@ import Image from 'next/image'
 import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css'
 import { useRouter } from 'next/router';
-import { Colors } from 'chart.js';
 
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
-
   const router = useRouter();
   const [gastoMensal, setGastoMensal] = useState(null);
   const [mesAtual, setMesAtual] = useState('');
@@ -48,8 +46,8 @@ export default function Home() {
     router.push('/financas');
   }
 
-  const handleMenuClick = () => {
-    router.push('/menu');
+  const handlerelatoriosClick = () => {
+    router.push('/relatorio');
   };
 
   const handleEstatisticaClick = () => {
@@ -63,7 +61,20 @@ export default function Home() {
   const handleDespesaClick = () => {
     router.push('/novadespesa');
   }
-  
+
+  const valorTotal = gastoMensal !== null ? gastoMensal.toFixed(2) : 0;
+
+  let divGastoMensalClass = styles.DivGastoMensal;
+  if (gastoMensal !== null) {
+    if (gastoMensal < 500) {
+      divGastoMensalClass += ` ${styles.MenorQue500}`;
+    } else if (gastoMensal >= 500 && gastoMensal <= 1000) {
+      divGastoMensalClass += ` ${styles.Entre500e1000}`;
+    } else {
+      divGastoMensalClass += ` ${styles.MaiorQue1000}`;
+    }
+  }
+
   return (
     <>
       <Head>
@@ -78,7 +89,7 @@ export default function Home() {
             <a onClick={handleFinancasClick}>+Finanças</a>
           </li>
           <li>
-            <a onClick={handleMenuClick}>Menu</a>
+            <a onClick={handlerelatoriosClick}>relatorios</a>
           </li>
           <li>
             <a onClick={handleEstatisticaClick}>Estátistica</a>
@@ -88,11 +99,11 @@ export default function Home() {
           </li>
         </ul>
 
-        <div className={styles.DivGastoMensal}>
+        <div className={divGastoMensalClass}>
             <h3>Gasto Mensal</h3>
             <h1>R$: {gastoMensal !== null ? gastoMensal.toFixed(2) : 'Carregando...'}</h1>
             <br></br>
-            <a href="#"><h5>Ver Detalhes</h5></a>
+            <a onClick={handlerelatoriosClick}><h5>Ver Detalhes</h5></a>
         </div>
 
         <div className={styles.DivCarteiraDisponivel}>

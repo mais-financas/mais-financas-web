@@ -1,7 +1,10 @@
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
+import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css';
 import { useRouter } from 'next/router';
+
+const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
   const router = useRouter();
@@ -9,6 +12,8 @@ export default function Home() {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [totalValue, setTotalValue] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 2; // Define quantos itens deseja mostrar por página
 
   const fetchCategories = () => {
     fetch('http://localhost:8080/categories')
@@ -41,8 +46,8 @@ export default function Home() {
     router.push('/financas');
   };
 
-  const handleMenuClick = () => {
-    router.push('/menu');
+  const handlerelatoriosClick = () => {
+    router.push('/relatorio');
   };
 
   const handleEstatisticaClick = () => {
@@ -53,6 +58,27 @@ export default function Home() {
     router.push('/consultoria');
   };
 
+  // Função para avançar para a próxima página
+  const nextPage = () => {
+    setCurrentPage((prevPage) => prevPage + 1);
+  };
+
+  // Função para retroceder para a página anterior
+  const prevPage = () => {
+    setCurrentPage((prevPage) => prevPage - 1);
+  };
+
+  // Índice do primeiro e último item a ser exibido na página atual
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+
+  // Itens a serem exibidos na página atual
+  const currentExpenses = despesas
+    .filter((despesa) =>
+      selectedCategory ? despesa.Categoria === selectedCategory : true
+    )
+    .slice(indexOfFirstItem, indexOfLastItem);
+
   return (
     <>
       <Head>
@@ -61,13 +87,13 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={styles.main}>
+      <main className={`${styles.main} ${inter.className}`}>
         <ul className={styles.menu}>
           <li>
             <a onClick={handleFinancasClick}>+Finanças</a>
           </li>
           <li>
-            <a onClick={handleMenuClick}>Menu</a>
+            <a onClick={handlerelatoriosClick}>relatorios</a>
           </li>
           <li>
             <a onClick={handleEstatisticaClick}>Estátistica</a>
@@ -76,14 +102,19 @@ export default function Home() {
             <a onClick={handleConsultoriaClick}>Consultoria</a>
           </li>
         </ul>
-
         <div className={styles.Bot}>
-          <h1>Tela em desenvolvimento</h1>
 
-          <div>
+          {/* Valor total das despesas em destaque */}
+          <div className={styles.totalContainer}>
+            <p className={styles.totalExpenses}>Total das despesas: R$ {totalValue.toFixed(2)}</p>
+          </div>
+
+          {/* Select para filtrar as categorias */}
+          <div className={styles.selectContainer}>
             <select
               onChange={(e) => setSelectedCategory(e.target.value)}
               value={selectedCategory || ''}
+              className={styles.select}
             >
               <option value="">Todas as categorias</option>
               {categories.map((category) => (
@@ -94,42 +125,38 @@ export default function Home() {
             </select>
           </div>
 
-          <p>Total das despesas: R$ {totalValue.toFixed(2)}</p>
 
-          <ul>
-            {despesas
-              .filter((despesa) =>
-                selectedCategory ? despesa.Categoria === selectedCategory : true
-              )
-              .map((despesa) => (
-                <li key={despesa.id}>
-                  <h1>Cadastro de Despesa</h1>
-                  <div className={styles.form__group}>
-                    <label htmlFor="Nome" className={styles.form__label}>
-                      Nome: {despesa.Nome}
-                    </label>
+          <ul className={styles.expensesList}>
+            {currentExpenses.map((despesa) => (
+              <li key={despesa.id} className={styles.expenseCard}>
+                <div className={styles.upperSection}>
+                  <div className={styles.typeAndValue}>
+                    <p className={styles.expenseType}>{despesa.Categoria}</p>
+                    <p className={styles.expenseValue}>R$ {despesa.Valor}</p>
                   </div>
-
-                  <div className={styles.form__group}>
-                    <label htmlFor="Valor" className={styles.form__label}>
-                      Valor: {despesa.Valor}
-                    </label>
+                </div>
+                <div className={styles.lowerSection}>
+                  <div className={styles.info}>
+                    <div className={styles.infoRow}>
+                      <label>Recorrência:</label>
+                      <input type='text' disabled value={despesa.Recorrencia} />
+                    </div>
+                    <div className={styles.infoRow}>
+                      <label>Nome:</label>
+                      <input type='text' disabled value={despesa.Nome} />
+                    </div>
                   </div>
-
-                  <div className={styles.form__group}>
-                    <label htmlFor="Categoria" className={styles.form__label}>
-                      Categoria: {despesa.Categoria}
-                    </label>
-                  </div>
-
-                  <div className={styles.form__group}>
-                    <label htmlFor="Recorrencia" className={styles.form__label}>
-                      Recorrencia: {despesa.Recorrencia}
-                    </label>
-                  </div>
-                </li>
-              ))}
+                </div>
+              </li>
+            ))}
           </ul>
+
+          {/* Controles de paginação */}
+          <div className={styles.pagination}>
+            <button onClick={prevPage} disabled={currentPage === 1}>Anterior</button>
+            <button onClick={nextPage} disabled={indexOfLastItem >= despesas.length}>Próxima</button>
+          </div>
+          
         </div>
       </main>
     </>

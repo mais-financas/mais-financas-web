@@ -15,8 +15,8 @@ export default function Home() {
     router.push('/financas');
   }
 
-  const handleMenuClick = () => {
-    router.push('/menu');
+  const handlerelatoriosClick = () => {
+    router.push('/relatorio');
   };
 
   const handleEstatisticaClick = () => {
@@ -50,7 +50,7 @@ export default function Home() {
             <a onClick={handleFinancasClick}>+Finanças</a>
           </li>
           <li>
-            <a onClick={handleMenuClick}>Menu</a>
+            <a onClick={handlerelatoriosClick}>relatorios</a>
           </li>
           <li>
             <a onClick={handleEstatisticaClick}>Estátistica</a>

@@ -5,19 +5,19 @@ const LineChart = ({ data }) => {
   const chartRef = useRef(null);
 
   useEffect(() => {
-    if (!chartRef.current) return;
+    if (!chartRef.current || !data) return;
 
     const ctx = chartRef.current.getContext('2d');
     const myChart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: data && data.labels ? data.labels : [],
+        labels: data.labels || [],
         datasets: [
           {
-            label: 'Gastos',
-            data: data && data.values ? data.values : [],
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            borderColor: 'rgba(75, 192, 192, 1)',
+            label: 'Gastos por Meses',
+            data: data.values || [],
+            backgroundColor: 'rgba(255, 99, 132, 0.2)', // Vermelho mais claro para o preenchimento
+            borderColor: 'rgba(255, 99, 132, 1)', // Vermelho mais escuro para a linha
             borderWidth: 1,
           },
         ],

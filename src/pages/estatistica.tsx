@@ -1,9 +1,12 @@
 import Head from 'next/head';
 import styles from '@/styles/Home.module.css';
 import { useRouter } from 'next/router';
+import { Inter } from 'next/font/google'
 import React, { useEffect, useState } from 'react';
 import PieChart from '@/pages/PieChart';
 import LineChart from '@/pages/LineChart';
+
+const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
   const router = useRouter();
@@ -59,8 +62,8 @@ export default function Home() {
     router.push('/financas');
   };
 
-  const handleMenuClick = () => {
-    router.push('/menu');
+  const handlerelatoriosClick = () => {
+    router.push('/relatorio');
   };
 
   const handleEstatisticaClick = () => {
@@ -74,7 +77,7 @@ export default function Home() {
   // Exemplo de como os dados podem ser obtidos na página Home
   const chartData = {
     labels: categorias || [],
-    values: gastosPorCategoria || [],
+    values: gastosPorCategoria || ["Sem dados"],
   };
 
   const LineData = {
@@ -90,13 +93,13 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={`${styles.main}`}>
+      <main className={`${styles.main} ${inter.className}`}>
         <ul className={styles.menu}>
           <li>
             <a onClick={handleFinancasClick}>+Finanças</a>
           </li>
           <li>
-            <a onClick={handleMenuClick}>Menu</a>
+            <a onClick={handlerelatoriosClick}>relatorios</a>
           </li>
           <li>
             <a onClick={handleEstatisticaClick}>Estátistica</a>
