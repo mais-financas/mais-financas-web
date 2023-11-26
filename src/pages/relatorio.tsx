@@ -1,19 +1,21 @@
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
-import { Inter } from 'next/font/google'
+import { Inter } from 'next/font/google';
 import styles from '@/styles/Home.module.css';
 import { useRouter } from 'next/router';
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'] });
 
 export default function Home() {
   const router = useRouter();
   const [despesas, setDespesas] = useState([]);
+  const [ganhos, setGanhos] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [totalValue, setTotalValue] = useState(0);
+  const [totalGanhos, setTotalGanhos] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 2; // Define quantos itens deseja mostrar por página
+  const itemsPerPage = 2;
 
   const fetchCategories = () => {
     fetch('http://localhost:8080/categories')
@@ -31,16 +33,28 @@ export default function Home() {
       .then((response) => response.json())
       .then((data) => setDespesas(data.despesas))
       .catch((error) => console.error('Erro ao obter despesas:', error));
+
+    fetch('http://localhost:8080/ganhos')
+      .then((response) => response.json())
+      .then((data) => setGanhos(data.ganhos))
+      .catch((error) => console.error('Erro ao obter ganhos:', error));
   }, []);
 
   useEffect(() => {
-    // Calcular o valor total quando as despesas ou a categoria selecionada mudam
-    const filteredExpenses = despesas.filter((despesa) =>
-      selectedCategory ? despesa.Categoria === selectedCategory : true
+    const filteredExpenses = despesas.filter((item) =>
+      selectedCategory ? item.Categoria === selectedCategory : true
     );
-    const total = filteredExpenses.reduce((acc, despesa) => acc + despesa.Valor, 0);
+    const total = filteredExpenses.reduce((acc, item) => acc + item.Valor, 0);
     setTotalValue(total);
   }, [despesas, selectedCategory]);
+
+  useEffect(() => {
+    const filteredGanhos = ganhos.filter((item) =>
+      selectedCategory ? item.Categoria === selectedCategory : true
+    );
+    const totalGanhosValue = filteredGanhos.reduce((acc, item) => acc + item.Valor, 0);
+    setTotalGanhos(totalGanhosValue);
+  }, [ganhos, selectedCategory]);
 
   const handleFinancasClick = () => {
     router.push('/financas');
@@ -58,26 +72,25 @@ export default function Home() {
     router.push('/consultoria');
   };
 
-  // Função para avançar para a próxima página
   const nextPage = () => {
     setCurrentPage((prevPage) => prevPage + 1);
   };
 
-  // Função para retroceder para a página anterior
   const prevPage = () => {
     setCurrentPage((prevPage) => prevPage - 1);
   };
 
-  // Índice do primeiro e último item a ser exibido na página atual
+  const itemsToShow = despesas
+    .concat(ganhos)
+    .filter((item) =>
+      selectedCategory ? item.Categoria === selectedCategory : true
+    )
+    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)) // Ordena por data de atualização, do mais recente para o mais antigo;
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
-  // Itens a serem exibidos na página atual
-  const currentExpenses = despesas
-    .filter((despesa) =>
-      selectedCategory ? despesa.Categoria === selectedCategory : true
-    )
-    .slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = itemsToShow.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
     <>
@@ -103,13 +116,10 @@ export default function Home() {
           </li>
         </ul>
         <div className={styles.Bot}>
-
-          {/* Valor total das despesas em destaque */}
           <div className={styles.totalContainer}>
             <p className={styles.totalExpenses}>Total das despesas: R$ {totalValue.toFixed(2)}</p>
+            <p className={styles.totalGanhos}>Total dos ganhos: R$ {totalGanhos.toFixed(2)}</p>
           </div>
-
-          {/* Select para filtrar as categorias */}
           <div className={styles.selectContainer}>
             <select
               onChange={(e) => setSelectedCategory(e.target.value)}
@@ -124,39 +134,48 @@ export default function Home() {
               ))}
             </select>
           </div>
-
-
           <ul className={styles.expensesList}>
-            {currentExpenses.map((despesa) => (
-              <li key={despesa.id} className={styles.expenseCard}>
+            {currentItems.map((item) => (
+              <li key={item.id} className={item.Recorrencia ? styles.expenseCard : styles.gainCard}>
                 <div className={styles.upperSection}>
                   <div className={styles.typeAndValue}>
-                    <p className={styles.expenseType}>{despesa.Categoria}</p>
-                    <p className={styles.expenseValue}>R$ {despesa.Valor}</p>
+                    <p className={styles.expenseType}>{item.Categoria}</p>
+                    <p className={styles.expenseValue}>R$ {item.Valor}</p>
                   </div>
                 </div>
                 <div className={styles.lowerSection}>
                   <div className={styles.info}>
                     <div className={styles.infoRow}>
-                      <label>Recorrência:</label>
-                      <input type='text' disabled value={despesa.Recorrencia} />
+                      {item.hasOwnProperty('Recorrencia') && (
+                        <>
+                          <label>Recorrência:</label>
+                          <input type='text' disabled value={item.Recorrencia} />
+                        </>
+                      )}
+                      {item.hasOwnProperty('Descricao') && (
+                        <>
+                          <label>Descrição:</label>
+                          <input type='text' disabled value={item.Descricao} />
+                        </>
+                      )}
                     </div>
                     <div className={styles.infoRow}>
                       <label>Nome:</label>
-                      <input type='text' disabled value={despesa.Nome} />
+                      <input type='text' disabled value={item.Nome} />
                     </div>
                   </div>
                 </div>
               </li>
             ))}
           </ul>
-
-          {/* Controles de paginação */}
           <div className={styles.pagination}>
-            <button onClick={prevPage} disabled={currentPage === 1}>Anterior</button>
-            <button onClick={nextPage} disabled={indexOfLastItem >= despesas.length}>Próxima</button>
+            <button onClick={prevPage} disabled={currentPage === 1}>
+              Anterior
+            </button>
+            <button onClick={nextPage} disabled={indexOfLastItem >= itemsToShow.length}>
+              Próxima
+            </button>
           </div>
-          
         </div>
       </main>
     </>

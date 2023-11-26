@@ -23,6 +23,10 @@ export default function Home( {data} ) {
     setdataForm({ ...dataForm, [e.target.name]: e.target.value });
   };
 
+  const handleAddCategoriaClick = () => {
+    router.push('/categoria');
+  };
+
   const sendContact = async (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     console.log(dataForm);
@@ -97,18 +101,21 @@ export default function Home( {data} ) {
                         </label>
                     </div>
 
-                    <div className={styles.form__group}>
-                    <select className={styles.form__field} placeholder="Categoria" name="Categoria" id="Categoria" onChange={onChangeInput} value={dataForm.Categoria} required>
+                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                      <div className={styles.form__group}>
+                        <select className={styles.form__field} placeholder="Categoria" name="Categoria" id="Categoria" onChange={onChangeInput} value={dataForm.Categoria} required>
                             <option value="" disabled selected>Selecione a Categoria</option>
                             {data.datahome.map((categoria, index) => (
                                 <option key={index} value={categoria.Nome}>
                                     {categoria.Nome}
                                 </option>
                             ))}
-                        </select>
-                        <label htmlFor="Categoria" className={styles.form__label}>
-                            Categoria
-                        </label>
+                          </select>
+                          <label htmlFor="Categoria" className={styles.form__label}>
+                              Categoria
+                          </label>
+                      </div>
+                      <button className={styles.ButtonDespesa} onClick={handleAddCategoriaClick}>Adicionar Despesa</button>
                     </div>
 
                     <div className={styles.form__group}>

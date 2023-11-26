@@ -1,23 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
+import Head from 'next/head';
+import Image from 'next/image';
+import { Inter } from 'next/font/google';
+import styles from '@/styles/Home.module.css';
 import { useRouter } from 'next/router';
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'] });
 
 export default function Home() {
   const router = useRouter();
   const [gastoMensal, setGastoMensal] = useState(null);
+  const [gastoSemana, setGastoSemana] = useState(null); 
   const [mesAtual, setMesAtual] = useState('');
+  const [totalGanhos, setTotalGanhos] = useState(null);
+  const [ganhosGerais, setGanhosGerais] = useState(null);
+  const [mostrarGanhosMes, setMostrarGanhosMes] = useState(true);
 
   useEffect(() => {
     const fetchGastoMensal = async () => {
       try {
         const response = await fetch('http://localhost:8080/gastos-do-mes-atual');
         const data = await response.json();
-        
+
         const somaGastos = data.gastosDoMesAtual.reduce((total, gasto) => total + gasto.Valor, 0);
 
         setGastoMensal(somaGastos);
@@ -25,7 +29,7 @@ export default function Home() {
         console.error('Erro ao obter gastos mensais:', error.message);
       }
     };
-
+    
     const obterMesAtual = () => {
       const meses = [
         'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -38,13 +42,65 @@ export default function Home() {
       setMesAtual(nomeMesAtual);
     };
 
+    const fetchGanhos = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/total-ganhos');
+        const data = await response.json();
+        const totalGanhos = data.totalGanhos || 0;
+        setTotalGanhos(totalGanhos);
+      } catch (error) {
+        console.error('Erro ao obter o valor total dos ganhos:', error.message);
+      }
+    };
+
+    const fetchGanhosGerais = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/total-ganhos-Gerais');
+        const data = await response.json();
+        const totalGanhosGerais = data.totalGanhos || 0;
+        setGanhosGerais(totalGanhosGerais);
+      } catch (error) {
+        console.error('Erro ao obter o valor total dos ganhos gerais:', error.message);
+      }
+    };
+
+    const fetchGastosDaSemana = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/gastos-da-semana');
+        const data = await response.json();
+
+        const somaGastos = data.gastosDaSemana.reduce((total, gasto) => total + gasto.Valor, 0);
+
+        setGastoSemana(somaGastos);  // Atualiza a variável de gastos da semana
+      } catch (error) {
+        console.error('Erro ao obter gastos da semana:', error.message);
+      }
+    };
+
+    const fetchGanhosDaSemana = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/ganhos-da-semana');
+        const data = await response.json();
+    
+        const somaGastos = data.gastosDaSemana.reduce((total, gasto) => total + gasto.Valor, 0);
+    
+        setGastoMensal(somaGastos);
+      } catch (error) {
+        console.error('Erro ao obter gastos da semana:', error.message);
+      }
+    };
+
     fetchGastoMensal();
+    fetchGanhosGerais();
+    fetchGanhos();
+    fetchGastosDaSemana();
+    fetchGanhosDaSemana();
     obterMesAtual();
   }, []);
 
   const handleFinancasClick = () => {
     router.push('/financas');
-  }
+  };
 
   const handlerelatoriosClick = () => {
     router.push('/relatorio');
@@ -52,15 +108,19 @@ export default function Home() {
 
   const handleEstatisticaClick = () => {
     router.push('/estatistica');
-  }
+  };
 
   const handleConsultoriaClick = () => {
     router.push('/consultoria');
-  }
+  };
 
   const handleDespesaClick = () => {
     router.push('/novadespesa');
-  }
+  };
+
+  const handlereceitaClick = () => {
+    router.push('/receita');
+  };
 
   const valorTotal = gastoMensal !== null ? gastoMensal.toFixed(2) : 0;
 
@@ -74,6 +134,10 @@ export default function Home() {
       divGastoMensalClass += ` ${styles.MaiorQue1000}`;
     }
   }
+
+  const handleToggleGanhos = () => {
+    setMostrarGanhosMes(!mostrarGanhosMes);
+  };
 
   return (
     <>
@@ -100,54 +164,75 @@ export default function Home() {
         </ul>
 
         <div className={divGastoMensalClass}>
-            <h3>Gasto Mensal</h3>
-            <h1>R$: {gastoMensal !== null ? gastoMensal.toFixed(2) : 'Carregando...'}</h1>
-            <br></br>
-            <a onClick={handlerelatoriosClick}><h5>Ver Detalhes</h5></a>
+          <h3>Gasto Mensal</h3>
+          <h1>R$: {gastoMensal !== null ? gastoMensal.toFixed(2) : 'Carregando...'}</h1>
+          <br></br>
+          <a onClick={handlerelatoriosClick}><h5 className={styles.Detalhe}>Ver Detalhes</h5></a>
         </div>
 
+
         <div className={styles.DivCarteiraDisponivel}>
-            <div className={styles.Textos}>
-                <h5>Carteira Disponível em {mesAtual}</h5>
-                <br></br>
-                <h6>Dinheiro Disponível</h6>
-            </div>
-            <div className={styles.Dinheiro}>
-                <h1>R$: 21,230</h1>
-            </div>
+          <div className={styles.Textos}>
+            <h5>
+              {mostrarGanhosMes
+                ? `Carteira Disponível em ${mesAtual}`
+                : 'Ganhos Gerais'}
+            </h5>
+            <br />
+            <a onClick={handlereceitaClick}>
+              <h5 className={styles.Detalhe}>Trazer Salario</h5>
+            </a>
+          </div>
+          <div className={styles.Dinheiro}>
+            {mostrarGanhosMes ? (
+              <>
+                <h3>$ {totalGanhos !== null ? totalGanhos.toFixed(2) : 'Carregando...'}</h3>
+                <button className={styles.btnHamburguer} onClick={handleToggleGanhos}>
+                  <div></div><div></div><div></div>
+                </button>
+              </>
+            ) : (
+              <>
+                <h3>${ganhosGerais !== null ? ganhosGerais.toFixed(2) : 'Carregando...'}</h3>
+                <button className={styles.btnHamburguer} onClick={handleToggleGanhos}>
+                  <div></div><div></div><div></div>
+                </button>
+              </>
+            )}
+          </div>
         </div>
 
         <div className={styles.DivObjetivos}>
-            <div className={styles.Textos}>
-                <h3>Objetivos</h3>
-                <h4>Confira seus Objetivos</h4>
-            </div>
-            <div className={styles.Dinheiro}>
-                <a href="#"><Image src="/icons8-casa-24.png" alt="Home" width={24} height={24}/></a>
-            </div>
+          <div className={styles.Textos}>
+            <h3>Objetivos</h3>
+            <h4>Confira seus Objetivos</h4>
+          </div>
+          <div className={styles.Dinheiro}>
+            <a href="#"><Image src="/icons8-casa-24.png" alt="Home" width={24} height={24} /></a>
+          </div>
         </div>
 
         <div className={styles.Container}>
-            <div className={styles.TituloDiv}>
-                <h2>Tranferências da Semana</h2>
+          <div className={styles.TituloDiv}>
+            <h2>Tranferências da Semana</h2>
+          </div>
+          <div className={styles.DivCentralizada}>
+            <div className={styles.Div1}>
+              <div className={styles.BolaVerde}></div>
+              <h3>$ {totalGanhos !== null ? totalGanhos.toFixed(2) : 'Carregando...'}</h3>
+              <h4>Ganhos</h4>
             </div>
-            <div className={styles.DivCentralizada}>
-                <div className={styles.Div1}>
-                    <div className={styles.BolaVerde}></div>
-                    <h3>$2,100.00</h3>
-                    <h4>Ganhos</h4>
-                </div>
-                <div className={styles.Div2}>
-                    <div className={styles.BolaVermelha}></div>
-                    <h3>${gastoMensal !== null ? gastoMensal.toFixed(2) : 'Carregando...'}</h3>
-                    <h4>Despesas</h4>
-                </div>
+            <div className={styles.Div2}>
+              <div className={styles.BolaVermelha}></div>
+              <h3>${gastoSemana !== null ? gastoSemana.toFixed(2) : 'Carregando...'}</h3>
+              <h4>Despesas</h4>
             </div>
+          </div>
         </div>
 
         <div className={styles.addDespesa}>
           <a onClick={handleDespesaClick}>
-            <Image className={styles.ButonAddDespesa} src="/add-button.svg" alt="Add Despesa" width={70} height={70}/>
+            <Image className={styles.ButonAddDespesa} src="/add-button.svg" alt="Add Despesa" width={70} height={70} />
             <h5 className={styles.TextDespesa}>Add Despesa</h5>
           </a>
         </div>
