@@ -176,16 +176,8 @@ export default function Home() {
     obterMesAtual()
   }, [id])
 
-  const handleFinancasClick = () => {
-    router.push('/financas')
-  }
-
   const handleEstatisticaClick = () => {
     router.push(`/estatistica/${id}`)
-  }
-
-  const handleDespesaClick = () => {
-    router.push('/novadespesa')
   }
 
   let divSaldoTotal = styles.DivGastoMensal
@@ -222,7 +214,7 @@ export default function Home() {
       <main className={`${styles.main} ${inter.className}`}>
         <ul className={styles.menu}>
           <li>
-            <a onClick={handleFinancasClick}>+Finanças</a>
+            <a onClick={() => {}}>+Finanças</a>
           </li>
           <li>
             <a onClick={handleEstatisticaClick}>Estatísticas</a>

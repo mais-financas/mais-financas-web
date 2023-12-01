@@ -89,11 +89,7 @@ export default function Home() {
   }, [id])
 
   const handleFinancasClick = () => {
-    router.push('/financas')
-  }
-
-  const handleEstatisticaClick = () => {
-    router.push('/estatistica')
+    router.push(`/financas/${id}`)
   }
 
   const pieChartData: ChartProps = {
@@ -128,7 +124,7 @@ export default function Home() {
             <a onClick={handleFinancasClick}>+Finanças</a>
           </li>
           <li>
-            <a onClick={handleEstatisticaClick}>Estatísticas</a>
+            <a onClick={() => {}}>Estatísticas</a>
           </li>
         </ul>
 
