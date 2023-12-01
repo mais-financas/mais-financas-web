@@ -5,7 +5,6 @@ import { useRouter } from 'next/router'
 import { Inter } from 'next/font/google'
 import React, { useEffect, useState } from 'react'
 import PieChart from '../Piechart'
-import LineChart from '@/pages/LineChart'
 import { Despesa } from '../financas/[id]'
 import Script from 'next/script'
 
@@ -87,7 +86,7 @@ export default function Home() {
     }
 
     fetchData()
-  }, [])
+  }, [id])
 
   const handleFinancasClick = () => {
     router.push('/financas')
@@ -98,11 +97,6 @@ export default function Home() {
   }
 
   const pieChartData: ChartProps = {
-    labels: categorias.map((categoria) => categoria.nome) || [],
-    values: valoresPorCategoria.map((gastos) => gastos.valor) || [],
-  }
-
-  const lineChartData: ChartProps = {
     labels: categorias.map((categoria) => categoria.nome) || [],
     values: valoresPorCategoria.map((gastos) => gastos.valor) || [],
   }
