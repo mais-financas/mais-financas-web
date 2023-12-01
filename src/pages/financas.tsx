@@ -76,7 +76,7 @@ export default function Home() {
     const fetchSaldoTotal = async () => {
       try {
         const despesasResponse = await fetch(
-          'http://localhost:8080/api/despesas?gestorId=0dffced9-a188-46f4-bc15-17f1f22c9341'
+          'https://mais-financas-api.onrender.com/api/despesas?gestorId=18eeac63-145b-4eee-9828-6e84cb0bea98'
         )
         const despesas: Despesa[] = await despesasResponse.json()
 
@@ -86,7 +86,7 @@ export default function Home() {
           .reduce((acc, valor) => acc + valor, 0)
 
         const rendasResponse = await fetch(
-          'http://localhost:8080/api/rendas?gestorId=0dffced9-a188-46f4-bc15-17f1f22c9341'
+          'https://mais-financas-api.onrender.com/api/rendas?gestorId=18eeac63-145b-4eee-9828-6e84cb0bea98'
         )
         const rendas: Renda[] = await rendasResponse.json()
 
@@ -103,7 +103,7 @@ export default function Home() {
     const fetchSaldoMensal = async () => {
       try {
         const despesasResponse = await fetch(
-          'http://localhost:8080/api/despesas?gestorId=0dffced9-a188-46f4-bc15-17f1f22c9341'
+          'https://mais-financas-api.onrender.com/api/despesas?gestorId=18eeac63-145b-4eee-9828-6e84cb0bea98'
         )
         const despesas: Despesa[] = await despesasResponse.json()
 
@@ -114,7 +114,7 @@ export default function Home() {
           .reduce((acc, valor) => acc + valor, 0)
 
         const rendasResponse = await fetch(
-          'http://localhost:8080/api/rendas?gestorId=0dffced9-a188-46f4-bc15-17f1f22c9341'
+          'https://mais-financas-api.onrender.com/api/rendas?gestorId=18eeac63-145b-4eee-9828-6e84cb0bea98'
         )
         const rendas: Renda[] = await rendasResponse.json()
 
@@ -132,7 +132,7 @@ export default function Home() {
     const fetchGastoMensal = async () => {
       try {
         const response = await fetch(
-          'http://localhost:8080/api/despesas?gestorId=0dffced9-a188-46f4-bc15-17f1f22c9341'
+          'https://mais-financas-api.onrender.com/api/despesas?gestorId=18eeac63-145b-4eee-9828-6e84cb0bea98'
         )
         const data: Despesa[] = await response.json()
 
@@ -150,7 +150,7 @@ export default function Home() {
     const fetchRendaMensal = async () => {
       try {
         const response = await fetch(
-          'http://localhost:8080/api/rendas?gestorId=0dffced9-a188-46f4-bc15-17f1f22c9341'
+          'https://mais-financas-api.onrender.com/api/rendas?gestorId=18eeac63-145b-4eee-9828-6e84cb0bea98'
         )
         const data: Renda[] = await response.json()
 

@@ -79,7 +79,7 @@ export default function Home() {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          'http://localhost:8080/api/despesas?gestorId=6da6f626-9590-40c9-bee8-f47a18e61e4b'
+          'https://mais-financas-api.onrender.com/api/despesas?gestorId=18eeac63-145b-4eee-9828-6e84cb0bea98'
         )
         const despesas: Despesa[] = await response.json()
 
