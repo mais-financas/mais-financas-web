@@ -1,21 +1,24 @@
-import React, { useEffect, useRef } from 'react';
-import Chart from 'chart.js/auto';
+import React, { useEffect, useRef } from 'react'
+import Chart from 'chart.js/auto'
+import { ChartProps } from './estatistica'
 
-const LineChart = ({ data }) => {
-  const chartRef = useRef(null);
+const LineChart: React.FC<ChartProps> = ({ labels, values }) => {
+  const chartRef = useRef<HTMLCanvasElement | null>(null)
 
   useEffect(() => {
-    if (!chartRef.current || !data) return;
+    if (!chartRef.current) return
+    const ctx = chartRef.current.getContext('2d')
 
-    const ctx = chartRef.current.getContext('2d');
+    if (!ctx) return
+
     const myChart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: data.labels || [],
+        labels: labels,
         datasets: [
           {
             label: 'Gastos por Meses',
-            data: data.values || [],
+            data: values,
             backgroundColor: 'rgba(255, 99, 132, 0.2)', // Vermelho mais claro para o preenchimento
             borderColor: 'rgba(255, 99, 132, 1)', // Vermelho mais escuro para a linha
             borderWidth: 1,
@@ -25,19 +28,18 @@ const LineChart = ({ data }) => {
       options: {
         responsive: true,
       },
-    });
+    })
 
     return () => {
-      // Limpar o gráfico ao desmontar o componente
-      myChart.destroy();
-    };
-  }, [data]);
+      myChart.destroy()
+    }
+  }, [labels, values])
 
   return (
     <div style={{ width: '400px' }}>
       <canvas ref={chartRef} />
     </div>
-  );
-};
+  )
+}
 
-export default LineChart;
+export default LineChart

@@ -1,151 +1,206 @@
-import React, { useState, useEffect } from 'react';
-import Head from 'next/head';
-import Image from 'next/image';
-import { Inter } from 'next/font/google';
-import styles from '@/styles/Home.module.css';
-import { useRouter } from 'next/router';
+import React, { useState, useEffect } from 'react'
+import Head from 'next/head'
+import Image from 'next/image'
+import { Inter } from 'next/font/google'
+import styles from '@/styles/Home.module.css'
+import { useRouter } from 'next/router'
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'] })
+
+interface Recorrencia {
+  frequencia: 'NENHUMA' | 'DIARIA' | 'SEMANAL' | 'MENSAL' | 'ANUAL'
+  quantidade: number
+}
+
+interface Registro {
+  id: number
+  valor: number
+  data: string
+}
+
+export interface Despesa {
+  id: number
+  nome: string
+  definir_lembrete: boolean
+  gestor_id: string
+  categoria_id: number
+  recorrencia: Recorrencia
+  registros: Registro[]
+}
+
+interface Renda {
+  id: number
+  descricao: string
+  valor: number
+  data: string
+}
+
+function isLastMonth(dataEmString: string): boolean {
+  const [ano, mes, dia] = dataEmString.split('-').map(Number)
+  const data = new Date(ano, mes - 1, dia) // Mês é base 0, então subtrai-se 1
+  return data.getMonth() == new Date().getMonth()
+}
 
 export default function Home() {
-  const router = useRouter();
-  const [gastoMensal, setGastoMensal] = useState(null);
-  const [gastoSemana, setGastoSemana] = useState(null); 
-  const [mesAtual, setMesAtual] = useState('');
-  const [totalGanhos, setTotalGanhos] = useState(null);
-  const [ganhosGerais, setGanhosGerais] = useState(null);
-  const [mostrarGanhosMes, setMostrarGanhosMes] = useState(true);
+  const [mesAtual, setMesAtual] = useState('')
+  const router = useRouter()
+  const [saldoTotal, setSaldoTotal] = useState(0)
+  const [saldoMensal, setSaldoMensal] = useState(0)
+
+  const [gastoMensal, setGastoMensal] = useState(0)
+  const [rendaMensal, setRendaMensal] = useState(0)
 
   useEffect(() => {
-    const fetchGastoMensal = async () => {
-      try {
-        const response = await fetch('http://localhost:8080/gastos-do-mes-atual');
-        const data = await response.json();
-
-        const somaGastos = data.gastosDoMesAtual.reduce((total, gasto) => total + gasto.Valor, 0);
-
-        setGastoMensal(somaGastos);
-      } catch (error) {
-        console.error('Erro ao obter gastos mensais:', error.message);
-      }
-    };
-    
     const obterMesAtual = () => {
       const meses = [
-        'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-      ];
+        'Janeiro',
+        'Fevereiro',
+        'Março',
+        'Abril',
+        'Maio',
+        'Junho',
+        'Julho',
+        'Agosto',
+        'Setembro',
+        'Outubro',
+        'Novembro',
+        'Dezembro',
+      ]
 
-      const agora = new Date();
-      const nomeMesAtual = meses[agora.getMonth()];
+      const agora = new Date()
+      const nomeMesAtual = meses[agora.getMonth()]
 
-      setMesAtual(nomeMesAtual);
-    };
+      setMesAtual(nomeMesAtual)
+    }
 
-    const fetchGanhos = async () => {
+    const fetchSaldoTotal = async () => {
       try {
-        const response = await fetch('http://localhost:8080/total-ganhos');
-        const data = await response.json();
-        const totalGanhos = data.totalGanhos || 0;
-        setTotalGanhos(totalGanhos);
-      } catch (error) {
-        console.error('Erro ao obter o valor total dos ganhos:', error.message);
-      }
-    };
+        const despesasResponse = await fetch(
+          'http://localhost:8080/api/despesas?gestorId=0dffced9-a188-46f4-bc15-17f1f22c9341'
+        )
+        const despesas: Despesa[] = await despesasResponse.json()
 
-    const fetchGanhosGerais = async () => {
+        const gastoTotal = despesas
+          .flatMap((despesa) => despesa.registros)
+          .map((registro) => registro.valor)
+          .reduce((acc, valor) => acc + valor, 0)
+
+        const rendasResponse = await fetch(
+          'http://localhost:8080/api/rendas?gestorId=0dffced9-a188-46f4-bc15-17f1f22c9341'
+        )
+        const rendas: Renda[] = await rendasResponse.json()
+
+        const rendaTotal = rendas
+          .map((renda) => renda.valor)
+          .reduce((acc, valor) => acc + valor, 0)
+
+        setSaldoTotal(rendaTotal - gastoTotal)
+      } catch (error: any) {
+        console.error('Erro ao obter gastos mensais:', error.message)
+      }
+    }
+
+    const fetchSaldoMensal = async () => {
       try {
-        const response = await fetch('http://localhost:8080/total-ganhos-Gerais');
-        const data = await response.json();
-        const totalGanhosGerais = data.totalGanhos || 0;
-        setGanhosGerais(totalGanhosGerais);
-      } catch (error) {
-        console.error('Erro ao obter o valor total dos ganhos gerais:', error.message);
-      }
-    };
+        const despesasResponse = await fetch(
+          'http://localhost:8080/api/despesas?gestorId=0dffced9-a188-46f4-bc15-17f1f22c9341'
+        )
+        const despesas: Despesa[] = await despesasResponse.json()
 
-    const fetchGastosDaSemana = async () => {
+        const gastoMensal = despesas
+          .flatMap((despesa) => despesa.registros)
+          .filter((registro) => isLastMonth(registro.data))
+          .map((registro) => registro.valor)
+          .reduce((acc, valor) => acc + valor, 0)
+
+        const rendasResponse = await fetch(
+          'http://localhost:8080/api/rendas?gestorId=0dffced9-a188-46f4-bc15-17f1f22c9341'
+        )
+        const rendas: Renda[] = await rendasResponse.json()
+
+        const rendaMensal = rendas
+          .filter((renda) => isLastMonth(renda.data))
+          .map((renda) => renda.valor)
+          .reduce((acc, valor) => acc + valor, 0)
+
+        setSaldoMensal(rendaMensal - gastoMensal)
+      } catch (error: any) {
+        console.error('Erro ao obter gastos mensais:', error.message)
+      }
+    }
+
+    const fetchGastoMensal = async () => {
       try {
-        const response = await fetch('http://localhost:8080/gastos-da-semana');
-        const data = await response.json();
+        const response = await fetch(
+          'http://localhost:8080/api/despesas?gestorId=0dffced9-a188-46f4-bc15-17f1f22c9341'
+        )
+        const data: Despesa[] = await response.json()
 
-        const somaGastos = data.gastosDaSemana.reduce((total, gasto) => total + gasto.Valor, 0);
+        const somaGastos = data
+          .flatMap((despesa) => despesa.registros)
+          .filter((registro) => isLastMonth(registro.data))
+          .reduce((acc, registro) => acc + registro.valor, 0)
 
-        setGastoSemana(somaGastos);  // Atualiza a variável de gastos da semana
-      } catch (error) {
-        console.error('Erro ao obter gastos da semana:', error.message);
+        setGastoMensal(somaGastos)
+      } catch (error: any) {
+        console.error('Erro ao obter gastos da semana:', error.message)
       }
-    };
+    }
 
-    const fetchGanhosDaSemana = async () => {
+    const fetchRendaMensal = async () => {
       try {
-        const response = await fetch('http://localhost:8080/ganhos-da-semana');
-        const data = await response.json();
-    
-        const somaGastos = data.gastosDaSemana.reduce((total, gasto) => total + gasto.Valor, 0);
-    
-        setGastoMensal(somaGastos);
-      } catch (error) {
-        console.error('Erro ao obter gastos da semana:', error.message);
-      }
-    };
+        const response = await fetch(
+          'http://localhost:8080/api/rendas?gestorId=0dffced9-a188-46f4-bc15-17f1f22c9341'
+        )
+        const data: Renda[] = await response.json()
 
-    fetchGastoMensal();
-    fetchGanhosGerais();
-    fetchGanhos();
-    fetchGastosDaSemana();
-    fetchGanhosDaSemana();
-    obterMesAtual();
-  }, []);
+        const somaGastos = data
+          .filter((renda) => isLastMonth(renda.data))
+          .map((renda) => renda.valor)
+          .reduce((acc, valor) => acc + valor, 0)
+
+        setRendaMensal(somaGastos)
+      } catch (error: any) {
+        console.error('Erro ao obter gastos da semana:', error.message)
+      }
+    }
+
+    fetchSaldoTotal()
+    fetchSaldoMensal()
+    fetchGastoMensal()
+    fetchRendaMensal()
+    obterMesAtual()
+  }, [])
 
   const handleFinancasClick = () => {
-    router.push('/financas');
-  };
-
-  const handlerelatoriosClick = () => {
-    router.push('/relatorio');
-  };
-
-  const handleEstatisticaClick = () => {
-    router.push('/estatistica');
-  };
-
-  const handleConsultoriaClick = () => {
-    router.push('/consultoria');
-  };
-
-  const handleDespesaClick = () => {
-    router.push('/novadespesa');
-  };
-
-  const handlereceitaClick = () => {
-    router.push('/receita');
-  };
-
-  const valorTotal = gastoMensal !== null ? gastoMensal.toFixed(2) : 0;
-
-  let divGastoMensalClass = styles.DivGastoMensal;
-  if (gastoMensal !== null) {
-    if (gastoMensal < 500) {
-      divGastoMensalClass += ` ${styles.MenorQue500}`;
-    } else if (gastoMensal >= 500 && gastoMensal <= 1000) {
-      divGastoMensalClass += ` ${styles.Entre500e1000}`;
-    } else {
-      divGastoMensalClass += ` ${styles.MaiorQue1000}`;
-    }
+    router.push('/financas')
   }
 
-  const handleToggleGanhos = () => {
-    setMostrarGanhosMes(!mostrarGanhosMes);
-  };
+  const handleEstatisticaClick = () => {
+    router.push('/estatistica')
+  }
+
+  const handleDespesaClick = () => {
+    router.push('/novadespesa')
+  }
+
+  let divSaldoTotal = styles.DivGastoMensal
+
+  if (saldoTotal < 0) {
+    divSaldoTotal += ` ${styles.MaiorQue1000}`
+  } else if (saldoTotal <= 1000) {
+    divSaldoTotal += ` ${styles.Entre500e1000}`
+  } else {
+    divSaldoTotal += ` ${styles.MenorQue500}`
+  }
 
   return (
     <>
       <Head>
         <title>Create Next App</title>
-        <meta name="description" content="Generated by create next app" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
+        <meta name='description' content='Generated by create next app' />
+        <meta name='viewport' content='width=device-width, initial-scale=1' />
+        <link rel='icon' href='/favicon.ico' />
       </Head>
       <main className={`${styles.main} ${inter.className}`}>
         <ul className={styles.menu}>
@@ -153,52 +208,28 @@ export default function Home() {
             <a onClick={handleFinancasClick}>+Finanças</a>
           </li>
           <li>
-            <a onClick={handlerelatoriosClick}>relatorios</a>
-          </li>
-          <li>
-            <a onClick={handleEstatisticaClick}>Estátistica</a>
-          </li>
-          <li>
-            <a onClick={handleConsultoriaClick}>Consultoria</a>
+            <a onClick={handleEstatisticaClick}>Estatísticas</a>
           </li>
         </ul>
 
-        <div className={divGastoMensalClass}>
-          <h3>Gasto Mensal</h3>
-          <h1>R$: {gastoMensal !== null ? gastoMensal.toFixed(2) : 'Carregando...'}</h1>
-          <br></br>
-          <a onClick={handlerelatoriosClick}><h5 className={styles.Detalhe}>Ver Detalhes</h5></a>
+        <div className={divSaldoTotal}>
+          <h3>Saldo Total</h3>
+          <h1>R$: {saldoTotal.toFixed(2)}</h1>
         </div>
-
 
         <div className={styles.DivCarteiraDisponivel}>
           <div className={styles.Textos}>
-            <h5>
-              {mostrarGanhosMes
-                ? `Carteira Disponível em ${mesAtual}`
-                : 'Ganhos Gerais'}
-            </h5>
-            <br />
-            <a onClick={handlereceitaClick}>
-              <h5 className={styles.Detalhe}>Trazer Salario</h5>
-            </a>
+            <h5>Carteira Disponível em {mesAtual}</h5>
           </div>
           <div className={styles.Dinheiro}>
-            {mostrarGanhosMes ? (
-              <>
-                <h3>$ {totalGanhos !== null ? totalGanhos.toFixed(2) : 'Carregando...'}</h3>
-                <button className={styles.btnHamburguer} onClick={handleToggleGanhos}>
-                  <div></div><div></div><div></div>
-                </button>
-              </>
-            ) : (
-              <>
-                <h3>${ganhosGerais !== null ? ganhosGerais.toFixed(2) : 'Carregando...'}</h3>
-                <button className={styles.btnHamburguer} onClick={handleToggleGanhos}>
-                  <div></div><div></div><div></div>
-                </button>
-              </>
-            )}
+            <>
+              <h3> R$ {saldoMensal}</h3>
+              <button className={styles.btnHamburguer} onClick={() => {}}>
+                <div></div>
+                <div></div>
+                <div></div>
+              </button>
+            </>
           </div>
         </div>
 
@@ -208,35 +239,48 @@ export default function Home() {
             <h4>Confira seus Objetivos</h4>
           </div>
           <div className={styles.Dinheiro}>
-            <a href="#"><Image src="/icons8-casa-24.png" alt="Home" width={24} height={24} /></a>
+            <a href='#'>
+              <Image
+                src='/icons8-casa-24.png'
+                alt='Home'
+                width={24}
+                height={24}
+              />
+            </a>
           </div>
         </div>
 
         <div className={styles.Container}>
           <div className={styles.TituloDiv}>
-            <h2>Tranferências da Semana</h2>
+            <h2>Transferências do Mês</h2>
           </div>
           <div className={styles.DivCentralizada}>
             <div className={styles.Div1}>
               <div className={styles.BolaVerde}></div>
-              <h3>$ {totalGanhos !== null ? totalGanhos.toFixed(2) : 'Carregando...'}</h3>
+              <h3>R$ {rendaMensal.toFixed(2)}</h3>
               <h4>Ganhos</h4>
             </div>
             <div className={styles.Div2}>
               <div className={styles.BolaVermelha}></div>
-              <h3>${gastoSemana !== null ? gastoSemana.toFixed(2) : 'Carregando...'}</h3>
+              <h3>R$ {gastoMensal.toFixed(2)}</h3>
               <h4>Despesas</h4>
             </div>
           </div>
         </div>
 
-        <div className={styles.addDespesa}>
+        {/* <div className={styles.addDespesa}>
           <a onClick={handleDespesaClick}>
-            <Image className={styles.ButonAddDespesa} src="/add-button.svg" alt="Add Despesa" width={70} height={70} />
+            <Image
+              className={styles.ButonAddDespesa}
+              src='/add-button.svg'
+              alt='Add Despesa'
+              width={70}
+              height={70}
+            />
             <h5 className={styles.TextDespesa}>Add Despesa</h5>
           </a>
-        </div>
+        </div> */}
       </main>
     </>
-  );
+  )
 }
