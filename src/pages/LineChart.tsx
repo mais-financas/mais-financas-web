@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import Chart from 'chart.js/auto'
-import { ChartProps } from './estatistica'
+import { ChartProps } from './estatistica/[id]'
 
 const LineChart: React.FC<ChartProps> = ({ labels, values }) => {
   const chartRef = useRef<HTMLCanvasElement | null>(null)

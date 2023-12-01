@@ -1,11 +1,13 @@
+'use-client'
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useRouter } from 'next/router'
 import { Inter } from 'next/font/google'
 import React, { useEffect, useState } from 'react'
-import PieChart from './Piechart'
+import PieChart from '../Piechart'
 import LineChart from '@/pages/LineChart'
-import { Despesa } from './financas'
+import { Despesa } from '../financas/[id]'
+import Script from 'next/script'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -36,27 +38,12 @@ function getMonth(dataEmString: string): number {
 
 export default function Home() {
   const router = useRouter()
-
-  const [valoresPorMes, setValoresPorMes] = useState<ValorPorMes[]>([])
+  const { id } = router.query
 
   const [categorias, setCategorias] = useState<Categoria[]>([])
   const [valoresPorCategoria, setValoresPorCategoria] = useState<
     ValorPorCategoria[]
   >([])
-  // const meses = [
-  //   'Janeiro',
-  //   'Fevereiro',
-  //   'Março',
-  //   'Abril',
-  //   'Maio',
-  //   'Junho',
-  //   'Julho',
-  //   'Agosto',
-  //   'Setembro',
-  //   'Outubro',
-  //   'Novembro',
-  //   'Dezembro',
-  // ]
 
   useEffect(() => {
     const categorias: Categoria[] = [
@@ -70,16 +57,10 @@ export default function Home() {
     ]
     setCategorias(categorias)
 
-    // const valoresIniciaisMes: ValorPorMes[] = meses.map((mes) => ({
-    //   mes,
-    //   valor: 0,
-    // }))
-    // setValoresPorMes(valoresIniciaisMes)
-
     const fetchData = async () => {
       try {
         const response = await fetch(
-          'https://mais-financas-api.onrender.com/api/despesas?gestorId=18eeac63-145b-4eee-9828-6e84cb0bea98'
+          `https://mais-financas-api.onrender.com/api/despesas?gestorId=${id}`
         )
         const despesas: Despesa[] = await response.json()
 
@@ -89,7 +70,6 @@ export default function Home() {
             valor: 0,
           })
         )
-        const valoresAgrupdadosPorMes = [...valoresPorMes]
 
         despesas.forEach((despesa) => {
           const { categoria_id, registros } = despesa
@@ -101,7 +81,6 @@ export default function Home() {
         })
 
         setValoresPorCategoria(valoresAgrupadosCategoria)
-        // setValoresPorMes(valoresAgrupdadosPorMes)
       } catch (error) {
         console.error('Erro ao buscar dados:', error)
       }
@@ -128,6 +107,18 @@ export default function Home() {
     values: valoresPorCategoria.map((gastos) => gastos.valor) || [],
   }
 
+  const initBotpress = () => {
+    window.botpressWebChat.init({
+      composerPlaceholder: 'Chat with bot',
+      botConversationDescription:
+        'This chatbot was built surprisingly fast with Botpress',
+      botId: 'b6cf7b0a-6c47-49c4-893b-3c81b3b479dd',
+      hostUrl: 'https://cdn.botpress.cloud/webchat/v0',
+      messagingUrl: 'https://messaging.botpress.cloud',
+      clientId: 'b6cf7b0a-6c47-49c4-893b-3c81b3b479dd',
+    })
+  }
+
   return (
     <>
       <Head>
@@ -150,14 +141,12 @@ export default function Home() {
           <h1>Gestão de Gastos</h1>
           <PieChart labels={pieChartData.labels} values={pieChartData.values} />
         </div>
-
-        {/* <div className={styles.GraficoLinha}>
-          <h1>Gastos</h1>
-          <LineChart
-            labels={lineChartData.labels}
-            values={lineChartData.values}
-          />
-        </div> */}
+        <Script
+          src='https://cdn.botpress.cloud/webchat/v0/inject.js'
+          onLoad={() => {
+            initBotpress()
+          }}
+        />
       </main>
     </>
   )

@@ -1,9 +1,11 @@
+'use-client'
 import React, { useState, useEffect } from 'react'
 import Head from 'next/head'
 import Image from 'next/image'
 import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css'
 import { useRouter } from 'next/router'
+import Script from 'next/script'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -37,13 +39,15 @@ interface Renda {
 
 function isLastMonth(dataEmString: string): boolean {
   const [ano, mes, dia] = dataEmString.split('-').map(Number)
-  const data = new Date(ano, mes - 1, dia) // Mês é base 0, então subtrai-se 1
+  const data = new Date(ano, mes, dia) // Mês é base 0, então subtrai-se 1
   return data.getMonth() == new Date().getMonth()
 }
 
 export default function Home() {
-  const [mesAtual, setMesAtual] = useState('')
   const router = useRouter()
+  const { id } = router.query
+
+  const [mesAtual, setMesAtual] = useState('')
   const [saldoTotal, setSaldoTotal] = useState(0)
   const [saldoMensal, setSaldoMensal] = useState(0)
 
@@ -76,7 +80,7 @@ export default function Home() {
     const fetchSaldoTotal = async () => {
       try {
         const despesasResponse = await fetch(
-          'https://mais-financas-api.onrender.com/api/despesas?gestorId=18eeac63-145b-4eee-9828-6e84cb0bea98'
+          `https://mais-financas-api.onrender.com/api/despesas?gestorId=${id}`
         )
         const despesas: Despesa[] = await despesasResponse.json()
 
@@ -86,7 +90,7 @@ export default function Home() {
           .reduce((acc, valor) => acc + valor, 0)
 
         const rendasResponse = await fetch(
-          'https://mais-financas-api.onrender.com/api/rendas?gestorId=18eeac63-145b-4eee-9828-6e84cb0bea98'
+          `https://mais-financas-api.onrender.com/api/rendas?gestorId=${id}`
         )
         const rendas: Renda[] = await rendasResponse.json()
 
@@ -103,7 +107,7 @@ export default function Home() {
     const fetchSaldoMensal = async () => {
       try {
         const despesasResponse = await fetch(
-          'https://mais-financas-api.onrender.com/api/despesas?gestorId=18eeac63-145b-4eee-9828-6e84cb0bea98'
+          `https://mais-financas-api.onrender.com/api/despesas?gestorId=${id}`
         )
         const despesas: Despesa[] = await despesasResponse.json()
 
@@ -114,7 +118,7 @@ export default function Home() {
           .reduce((acc, valor) => acc + valor, 0)
 
         const rendasResponse = await fetch(
-          'https://mais-financas-api.onrender.com/api/rendas?gestorId=18eeac63-145b-4eee-9828-6e84cb0bea98'
+          `https://mais-financas-api.onrender.com/api/rendas?gestorId=${id}`
         )
         const rendas: Renda[] = await rendasResponse.json()
 
@@ -132,7 +136,7 @@ export default function Home() {
     const fetchGastoMensal = async () => {
       try {
         const response = await fetch(
-          'https://mais-financas-api.onrender.com/api/despesas?gestorId=18eeac63-145b-4eee-9828-6e84cb0bea98'
+          `https://mais-financas-api.onrender.com/api/despesas?gestorId=${id}`
         )
         const data: Despesa[] = await response.json()
 
@@ -150,7 +154,7 @@ export default function Home() {
     const fetchRendaMensal = async () => {
       try {
         const response = await fetch(
-          'https://mais-financas-api.onrender.com/api/rendas?gestorId=18eeac63-145b-4eee-9828-6e84cb0bea98'
+          `https://mais-financas-api.onrender.com/api/rendas?gestorId=${id}`
         )
         const data: Renda[] = await response.json()
 
@@ -177,7 +181,7 @@ export default function Home() {
   }
 
   const handleEstatisticaClick = () => {
-    router.push('/estatistica')
+    router.push(`/estatistica/${id}`)
   }
 
   const handleDespesaClick = () => {
@@ -192,6 +196,18 @@ export default function Home() {
     divSaldoTotal += ` ${styles.Entre500e1000}`
   } else {
     divSaldoTotal += ` ${styles.MenorQue500}`
+  }
+
+  const initBotpress = () => {
+    window.botpressWebChat.init({
+      composerPlaceholder: 'Chat with bot',
+      botConversationDescription:
+        'This chatbot was built surprisingly fast with Botpress',
+      botId: 'b6cf7b0a-6c47-49c4-893b-3c81b3b479dd',
+      hostUrl: 'https://cdn.botpress.cloud/webchat/v0',
+      messagingUrl: 'https://messaging.botpress.cloud',
+      clientId: 'b6cf7b0a-6c47-49c4-893b-3c81b3b479dd',
+    })
   }
 
   return (
@@ -268,18 +284,12 @@ export default function Home() {
           </div>
         </div>
 
-        {/* <div className={styles.addDespesa}>
-          <a onClick={handleDespesaClick}>
-            <Image
-              className={styles.ButonAddDespesa}
-              src='/add-button.svg'
-              alt='Add Despesa'
-              width={70}
-              height={70}
-            />
-            <h5 className={styles.TextDespesa}>Add Despesa</h5>
-          </a>
-        </div> */}
+        <Script
+          src='https://cdn.botpress.cloud/webchat/v0/inject.js'
+          onLoad={() => {
+            initBotpress()
+          }}
+        />
       </main>
     </>
   )

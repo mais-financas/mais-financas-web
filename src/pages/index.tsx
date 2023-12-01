@@ -10,7 +10,7 @@ export default function Home() {
   const router = useRouter()
 
   const handleButtonClick = () => {
-    router.push('/financas')
+    router.push('/login')
   }
 
   return (
@@ -33,15 +33,8 @@ export default function Home() {
         <h1 className={styles.h1}>Gerencie Suas Finanças</h1>
 
         <button className={styles.Button} onClick={handleButtonClick}>
-          Começe Aqui
+          Entrar
         </button>
-
-        <h5 className={styles.h5}>
-          Não tem uma Conta?{' '}
-          <a href='/Cadastro' className={styles.loginLink}>
-            Se Cadastre
-          </a>
-        </h5>
       </main>
     </>
   )
