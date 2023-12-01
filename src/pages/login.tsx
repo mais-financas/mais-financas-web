@@ -66,7 +66,7 @@ export default function Login() {
         <h1 className={styles.h1}>Entre com a sua Conta</h1>
         <div>
           <Image
-            src='/Dinheiro.png'
+            src='/logo.png'
             alt='Cartiera de Dinheiro'
             width={100}
             height={100}

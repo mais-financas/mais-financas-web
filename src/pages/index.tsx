@@ -23,13 +23,14 @@ export default function Home() {
       </Head>
       <main className={`${styles.main} ${inter.className}`}>
         <Image
-          src='/Dinheiro.png'
+          src='/logo.png'
           alt='Cartiera de Dinheiro'
           width={300}
           height={300}
           className={styles.image}
         />
-
+        <br />
+        <br />
         <h1 className={styles.h1}>Gerencie Suas Finanças</h1>
 
         <button className={styles.Button} onClick={handleButtonClick}>

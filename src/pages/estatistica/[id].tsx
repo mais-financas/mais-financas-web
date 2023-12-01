@@ -108,6 +108,7 @@ export default function Home() {
   }
 
   const initBotpress = () => {
+    const window: any = Window
     window.botpressWebChat.init({
       composerPlaceholder: 'Chat with bot',
       botConversationDescription:
